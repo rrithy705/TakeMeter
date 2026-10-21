@@ -51,10 +51,11 @@ invites discussion).
 
 ### Community
 
-I am focusing on Java and software engineering discussions in LinkedIn group
-25827: https://www.linkedin.com/groups/25827/
+I am focusing on Java and software engineering discussions in the LinkedIn
+group Java Developers Community (group 25827):
+https://www.linkedin.com/groups/25827/
 
-**Group name:** _TODO: enter the exact group name._
+**Group name:** Java Developers Community (LinkedIn)
 
 **Public access:** _TODO: confirm that this community is public and does not
 need an invitation or membership approval to view its posts. When I checked,

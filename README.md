@@ -443,6 +443,22 @@ will swing a lot between seeds.
   most- vs. least-confident-third measure the notebook actually reports.
   Claude wrote the wording of the criteria and reasons from my choices.
 
+**Moment 3 (unit 6)**
+
+- *What I asked for:* Help running the unit 6 testing pipeline with Claude
+  Code: the baseline (with and without definitions), the three-seed run, the
+  confusion matrices, and a first draft of the unit 6 README sections.
+- *What came back:* It ran `baseline.py` twice and ran sections 6 and 7 of the
+  notebook headless across seeds 42 / 7 / 2024. It pointed out that every
+  seed predicted `resource_promotion` for every post, and that validation loss
+  was still falling at epoch 3, so it suggested undertraining as the cause. It
+  also spotted that my `discussion_opinion` definition mentions both other
+  labels, which is why the baseline did worse with my definitions than with
+  bare label names. It drafted the run logs, verdicts and diagnoses from those
+  numbers.
+- *What I changed:* _TODO(you): what you checked, rewrote or disagreed with._
+  The prediction, the staff labels and every adjudication are my own.
+
 **Pre-labelling disclosure:** Posts 1–20 were labelled cold, by me alone.
 The rest were pre-labelled by Claude and are marked in the note column.
 _TODO: confirm "I read and corrected every one" once that is true._
@@ -457,118 +473,148 @@ _TODO: confirm "I read and corrected every one" once that is true._
 
 ## Baseline vs. Trained
 
-<!-- Both models on the same posts. `python baseline.py --trained results.json`
-     prints this table for you. -->
+Both models scored on the same 30 held-out posts in `test_split.csv` (seed 42
+split). Baseline: `facebook/bart-large-mnli` zero-shot, prompted with my three
+definitions from `label_definitions.txt`, no training. Trained: the unit 5
+`distilbert-base-uncased` run (`results.json`, 3 epochs, `mps`).
 
 | Measure | Baseline | Trained | Difference |
 |---|---|---|---|
-| Overall accuracy |  |  |  |
-| Macro F1 |  |  |  |
-| F1 — `label_one` |  |  |  |
-| F1 — `label_two` |  |  |  |
+| Overall accuracy | 0.300 | 0.567 | +0.267 |
+| Macro F1 | 0.296 | 0.241 | -0.054 |
+| F1 — `discussion_opinion` | 0.320 | 0.000 | -0.320 |
+| F1 — `resource_promotion` | 0.300 | 0.723 | +0.423 |
+| F1 — `technical_explanation` | 0.267 | 0.000 | -0.267 |
 
-**What I predicted before I looked:**
-<!-- Milestone 1 asks you to write this BEFORE seeing the trained numbers. A
-     prediction made afterwards isn't one. -->
+**Definitions vs. bare label names.** I also ran the baseline once without
+`label_definitions.txt`, so it saw only the label names
+(`baseline_results_bare_names.json`). The table above uses the definitions
+run, which is the official baseline.
 
-**What the gap actually means:**
-<!-- If the baseline matched your trained model, your fine-tuning added
-     nothing — and that is a real finding, not a failure. Say it plainly. -->
+| Baseline prompt | Accuracy | Macro F1 | F1 tech | F1 resource | F1 discussion |
+|---|---|---|---|---|---|
+| My definitions | 0.300 | 0.296 | 0.267 | 0.300 | 0.320 |
+| Bare label names | 0.467 | 0.407 | 0.154 | 0.667 | 0.400 |
 
+My definitions made the baseline **worse by 0.167 accuracy**. With the
+definitions, it called 21 of 30 posts `discussion_opinion`, including 10 of the
+17 real `resource_promotion` posts. The `discussion_opinion` definition ends
+"…without mainly explaining a technical concept or promoting a resource", so
+it mentions both of the other labels. An entailment model reads that sentence
+as matching almost any post. The definitions are written for a human who
+reads the "without", not for a model that matches words.
 
+**What I predicted before I looked:** I predicted that the trained model's
+labels would be at least 80 percent correct.
+
+**What the gap actually means:** The unit 5 trained model beats the baseline
+on accuracy (+0.267), but it has no real skill. It predicted
+`resource_promotion` for all 30 posts, so its 0.567 equals the share of that
+label in the test split. On macro F1 it **loses** to the baseline (0.241 vs.
+0.296). The baseline is weak but at least tries all three labels. As trained
+in unit 5, fine-tuning added nothing except "guess the majority". After the
+improvement below, the trained model on this same split scores 0.833 accuracy
+and 0.818 macro F1. That gap of +0.533 over the baseline is real.
+
+**Runtime:** the baseline took a few seconds per post on `mps` (a couple of
+minutes for 30). The trained model scores all 30 posts in under a second.
 
 ---
 
 ## Run Log — Before
 
-<!-- Five criteria across three seeds. The notebook's section 6 prints the
-     spread table; the Target and Verdict columns are yours. -->
+Unit 5 settings (3 epochs, lr 2e-5, batch 16), seeds 42 / 7 / 2024, device
+`mps` (Apple Silicon GPU), torch 2.14.1. Source:
+`results_three_seeds_before.json`.
 
 | Criterion | Target | Seed 42 | Seed 7 | Seed 2024 | Verdict |
 |---|---|---|---|---|---|
-| 1.  |  |  |  |  |  |
-| 2.  |  |  |  |  |  |
-| 3.  |  |  |  |  |  |
-| 4.  |  |  |  |  |  |
-| 5.  |  |  |  |  |  |
+| 1. Overall accuracy | ≥ 0.70 | 0.567 | 0.567 | 0.567 | MISSED |
+| 2. Every label F1 (tech / resource / discussion) | ≥ 0.60 each | 0.00 / 0.72 / 0.00 | 0.00 / 0.72 / 0.00 | 0.00 / 0.72 / 0.00 | MISSED |
+| 3. Dataset balance (every label 10–60%) | 10% ≤ share ≤ 60% | 30% / 58% / 12% | same file | same file | MET |
+| 4. Agreement with staff on 30 posts | ≥ 80% | _TODO_ (one number, not per seed) | — | — | _TODO_ |
+| 5. Most-confident third acc / gap to least-confident third | ≥ 0.80 and gap ≥ 0.15 | 1.00 / +1.00 | 1.00 / +0.80 | 1.00 / +0.90 | MET (vacuous, see below) |
+
+Spread across seeds: **0.000** on every measure. All three seeds produced the
+same predictions: `resource_promotion` for every post.
 
 ### Confusion matrix
 
-<!-- ⚠️ TYPED AS A MARKDOWN TABLE. The notebook prints one ready to paste.
-     An image of a matrix earns nothing. -->
+Seed 42. Seeds 7 and 2024 are identical, because every split is stratified to
+9 / 17 / 4 and every post was predicted `resource_promotion`.
 
-| true \ predicted |  |  |  |
+| true \ predicted | technical_explanation | resource_promotion | discussion_opinion |
 |---|---|---|---|
-| **** |  |  |  |
-| **** |  |  |  |
-| **** |  |  |  |
+| **technical_explanation** | 0 | 9 | 0 |
+| **resource_promotion** | 0 | 17 | 0 |
+| **discussion_opinion** | 0 | 4 | 0 |
 
-**My biggest off-diagonal number, and what it means:**
-<!-- Not "the model made mistakes" — WHICH boundary it didn't learn, and which
-     direction. "7 real analysis posts were called hot_take and only 3 went the
-     other way" is a direction, not just an error rate. -->
-
-
+**My biggest off-diagonal number, and what it means:** 9 real
+`technical_explanation` posts were called `resource_promotion`, and none went
+the other way. That is not one boundary going wrong; the model has learned no
+boundary at all, so the whole matrix sits in the majority column. The notebook
+says a lopsided direction "usually points at your labelling". Here it points at
+training instead, because the `discussion_opinion` posts collapse into the same
+column, and that pair isn't my hard boundary.
 
 ---
 
 ## Verdicts and Diagnoses
 
-<!-- MET or MISSED against LAST UNIT's target. The target has to hold across
-     all three seeds, not turn up sometimes. -->
+Every model criterion must hold on all three seeds.
 
 | # | Criterion | Target | Verdict | How I decided |
 |---|---|---|---|---|
-| 1 |  |  |  |  |
-| 2 |  |  |  |  |
-| 3 |  |  |  |  |
-| 4 |  |  |  |  |
-| 5 |  |  |  |  |
+| 1 | Overall accuracy | ≥ 0.70 | MISSED | 0.567 (17/30) on all three seeds, 4 posts short of the 21/30 target on each. |
+| 2 | Every label F1 | ≥ 0.60 | MISSED | `technical_explanation` and `discussion_opinion` are 0.00 on all three seeds. |
+| 3 | Dataset balance | 10%–60% per label | MET | 114 / 58 / 24 of 196 = 58% / 30% / 12%. Both bounds hold, but the 60% cap holds by only 2 points. |
+| 4 | Labeling consistency vs. staff | ≥ 80% (24/30) | _TODO_ | _Run `agreement.py` once you have the staff labels._ |
+| 5 | Confidence | top third ≥ 0.80, gap ≥ 0.15 | MET, but vacuously | Top third 1.00 on every seed. The gap is 1.00 / 0.80 / 0.90. The letter of the criterion is met. |
 
 **Diagnoses**
 
-<!-- For each miss: the cause, and how you know. The four common causes are:
-     too few examples for a label, a boundary you applied inconsistently, a
-     genuinely hard label pair, and a task the model can't reach from this
-     much data.
+**Criteria 1 and 2: a training problem, not a labeling problem.**
+- *Cause:* undertraining. 136 training posts at batch 16 is 9 steps per epoch,
+  so 3 epochs is only 27 gradient steps at lr 2e-5. That isn't enough to move
+  off the majority prior.
+- *Evidence:*
+  1. Validation loss was still falling at the last epoch on every seed
+     (seed 42: 0.935 → 0.827 → 0.787; seed 7: 0.940 → 0.857 → 0.830;
+     seed 2024: 0.938 → 0.844 → 0.810), and average training loss was
+     0.88–0.90. The model hadn't finished learning when training stopped.
+  2. The matrix is a single column. A labeling problem on my hard boundary
+     would show `technical_explanation` ↔ `resource_promotion` confusion while
+     `discussion_opinion` survived. Here every label collapses, including the
+     one with the most distinct posts.
+  3. The confidence scores already rank posts well: the most-confident third
+     is 100% correct on every seed. The model has signal; it just never pushes
+     a non-majority class past 50%.
+  4. _TODO(you): the agreement report is the instrument that rules a labeling
+     problem in or out. Add one sentence here once you have it, for example
+     "my agreement was X/30, and Y of my disagreements were pile (a)…"._
 
-     ⚠️ Use your agreement report as evidence. It is the only instrument you
-     have that can tell a LABELLING problem from a MODEL problem, and this
-     section is graded on whether you used it that way. -->
-
-
+**Criterion 5: met, but the criterion has a hole.** All predictions were
+`resource_promotion`, so "confidence" here only measures how much a post looks
+like a bare link share. The 10 most link-like posts really were links, so the
+top third scored 1.00. A model with zero skill on two of three labels passed
+this criterion. The criterion is measurable, so I'm leaving it as written, but
+a verdict of MET here says nothing about whether the model is useful. Criteria
+1 and 2 are the ones that catch that.
 
 ---
 
 ## Agreement Report
 
-<!-- Your rate against the staff set, and every disagreement adjudicated.
-
-     Remember you labelled these 30 under the STAFF taxonomy in
-     data/staff_taxonomy.md, not your own — so every argument below is made
-     from those definitions and those decision rules. -->
+<!-- TODO(you): this whole section is yours.
+     1. Label all 30 posts in data/staff_posts.csv under data/staff_taxonomy.md
+        and save my_staff_labels.csv (text,label — text pasted exactly).
+     2. ONLY THEN get data/staff_labels.csv from your TF.
+     3. python agreement.py   → commit agreement_results.json
+     4. Adjudicate every disagreement below and sort into piles (a)/(b)/(c). -->
 
 **Agreement rate:** ___ / 30 = ___%
 
-<!-- Nobody grades this number. A 60% who argues every disagreement from the
-     stated rules beats a 95% who wrote "staff was right" nine times. Several
-     of the 30 were chosen because they're genuinely ambiguous — you should be
-     winning some of these. -->
-
 **Disagreements**
-
-<!-- Three lines each: the post, both labels, and who you think is right and
-     why — grounded in the staff definitions you were both applying.
-
-     Then sort each into one of three piles:
-       (a) the rule covered it and I applied it loosely → a consistency problem
-       (b) the rule genuinely doesn't say               → a gap in the definitions
-       (c) the rule is ambiguous here and my reading is defensible → argue it.
-           This is a legitimate win.
-
-     Pile (a) is the one that matters most for your diagnosis: if you applied a
-     written rule two different ways on 30 posts, that is direct evidence about
-     what you did across your own 200. -->
 
 **1.**
 > *The post:*
@@ -579,56 +625,100 @@ _TODO: confirm "I read and corrected every one" once that is true._
 >
 > *Which pile:*
 
-**2.**
-> *The post:*
->
-> *Staff said / I said:*
->
-> *My call, and why:*
->
-> *Which pile:*
-
 **What the pattern in my disagreements tells me:**
 
-
+_TODO_
 
 ---
 
 ## The Improvement
 
-**What I changed:**
+**What I changed:** One training setting: `EPOCHS` 3 → 10. Everything else is
+unchanged: same `labels.csv`, same taxonomy, same criteria, lr 2e-5, batch 16,
+max length 128, seeds 42 / 7 / 2024, device `mps`. Source:
+`results_three_seeds_after.json`.
 
-**Which diagnosis pointed at it:**
+**Which diagnosis pointed at it:** The diagnosis for criteria 1 and 2. Loss was
+still falling after epoch 3, and the model predicted only the majority class
+while its confidence ranking already carried signal. The brief says a training
+setting is usually the wrong fix, but this is the case where the evidence
+points at training rather than at my labels.
 
 ### Run Log — After
 
 | Criterion | Target | Seed 42 | Seed 7 | Seed 2024 | Verdict |
 |---|---|---|---|---|---|
-| 1.  |  |  |  |  |  |
-| 2.  |  |  |  |  |  |
-| 3.  |  |  |  |  |  |
-| 4.  |  |  |  |  |  |
-| 5.  |  |  |  |  |  |
+| 1. Overall accuracy | ≥ 0.70 | 0.833 | 0.867 | 0.767 | MET |
+| 2. Every label F1 (tech / resource / discussion) | ≥ 0.60 each | 0.78 / 0.88 / 0.80 | 0.89 / 0.89 / 0.67 | 0.71 / 0.84 / **0.40** | MISSED |
+| 3. Dataset balance (every label 10–60%) | 10% ≤ share ≤ 60% | 30% / 58% / 12% | same file | same file | MET |
+| 4. Agreement with staff on 30 posts | ≥ 80% | _TODO_ (unchanged by a training setting) | — | — | _TODO_ |
+| 5. Most-confident third acc / gap to least-confident third | ≥ 0.80 and gap ≥ 0.15 | 1.00 / +0.50 | 1.00 / +0.20 | 1.00 / +0.50 | MET |
 
-**Did it help, and how do I know:**
+Spread table from section 6:
 
-<!-- If it didn't, say so. Relabelling that didn't help is a genuinely
-     interesting result and earns full credit. -->
+| Measure | Seed 42 | Seed 7 | Seed 2024 | Spread |
+|---|---|---|---|---|
+| Overall accuracy | 0.833 | 0.867 | 0.767 | 0.100 |
+| Macro F1 | 0.818 | 0.815 | 0.649 | 0.168 |
+| F1 — `technical_explanation` | 0.778 | 0.889 | 0.706 | 0.183 |
+| F1 — `resource_promotion` | 0.875 | 0.889 | 0.842 | 0.047 |
+| F1 — `discussion_opinion` | 0.800 | 0.667 | 0.400 | 0.400 |
 
+Confusion matrix after, **summed across all three seeds** (90 test
+predictions):
 
+| true \ predicted | technical_explanation | resource_promotion | discussion_opinion |
+|---|---|---|---|
+| **technical_explanation** | 21 | 5 | 1 |
+| **resource_promotion** | 4 | 46 | 1 |
+| **discussion_opinion** | 1 | 4 | 7 |
+
+**Did it help, and how do I know:** Yes, a lot.
+- **Accuracy:** went from 0.567 on every seed to 0.767–0.867, so criterion 1
+  moves from MISSED to MET with its lowest seed 0.067 above target.
+- **Matrix:** now has a real diagonal. The model learned all three labels.
+- **Errors that remain:** 9 of the 16 summed errors still fall into the
+  `resource_promotion` column. The remaining leaning is toward the majority
+  label.
+- **My hard boundary:** `technical_explanation` ↔ `resource_promotion` is now
+  roughly symmetric, 5 one way and 4 the other. That looks like a genuinely
+  hard pair, not a one-sided labeling habit.
+- **Criterion 2:** still MISSED, on one seed and one label. `discussion_opinion`
+  recall on seed 2024 is 1 of 4.
+
+The 0.100 accuracy spread means these numbers are less stable than the flat
+"before" run, which was stable only because it was degenerate.
 
 ---
 
 ## What's Still Broken
 
-<!-- For each criterion still missed: what you'd do, and why you stopped. -->
+**Criterion 2: `discussion_opinion` F1 (0.40 on seed 2024).**
+- *Cause:* too few examples. There are 24 in total, so about 16 in training and
+  4 in each test split. One missed post moves recall by 0.25. Its F1 swings
+  from 0.40 to 0.80 across seeds, while `resource_promotion` (17 per split)
+  moves only 0.047.
+- *Where they go:* the summed matrix sends 4 of its 5 misses to
+  `resource_promotion`.
+- *What I'd do:* collect about 30 more `discussion_opinion` posts, the
+  "add examples to your thinnest label" fix. That would also loosen the 60% cap
+  in criterion 3, where `resource_promotion` sits at 58%.
+- *Why I stopped:* the brief allows one improvement in this unit, and I spent
+  it on the epochs, which my diagnosis named first.
+- _TODO(you): if your agreement report shows you split opinion posts
+  inconsistently, say so here, because that would change the fix from "collect
+  more" to "relabel first"._
 
-
+**Criterion 4:** _TODO, depends on the agreement report._
 
 **The gap between what I meant my labels to capture and what the model
-learned:**
-<!-- Two sentences. Your confusion matrix is the evidence. -->
-
+learned:** I meant the labels to capture a post's *purpose*: teach, point
+elsewhere, or start a conversation. In unit 5 the model learned only "most
+posts are links", the single-column matrix. Even after 10 epochs, most of its
+remaining errors still fall back to `resource_promotion`. My guess is that it
+leans on surface cues like a `lnkd.in` URL or a title-shaped first line, not on
+whether the post teaches anything without the click. That is exactly the
+distinction my decision rule depends on.
 
 
 <!-- ═════════════════════════════════════════════════════════════════════

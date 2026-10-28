@@ -1,0 +1,184 @@
+{
+  "model": "facebook/bart-large-mnli",
+  "n": 30,
+  "seed": 42,
+  "held_out": true,
+  "used_definitions": true,
+  "scores": {
+    "n": 30,
+    "accuracy": 0.3,
+    "f1_macro": 0.29555555555555557,
+    "per_label": {
+      "discussion_opinion": {
+        "precision": 0.19047619047619047,
+        "recall": 1.0,
+        "f1": 0.32,
+        "support": 4
+      },
+      "resource_promotion": {
+        "precision": 1.0,
+        "recall": 0.17647058823529413,
+        "f1": 0.3,
+        "support": 17
+      },
+      "technical_explanation": {
+        "precision": 0.3333333333333333,
+        "recall": 0.2222222222222222,
+        "f1": 0.26666666666666666,
+        "support": 9
+      }
+    }
+  },
+  "predictions": [
+    {
+      "text": "New Coding Interview Post: \"Course Schedule & Dependency Resolution: Kahn\u2019s vs DFS\" A course catalog is more than a list of classes: it is a dependency graph. \u201cAlgorithms II requires Algorithms I\u201d is the same underlying problem as \u201ccompile this module after its imports\u201d (build systems), \u201cinstall a package after its dependencies\u201d (package managers) or \u201crun this deployment step after the database migration\u201d (task orchestrators). That connection makes three LeetCode problems especially valuable: * #207 \u2014 Course Schedule: Can all courses be completed? * #210 \u2014 Course Schedule II: If so, return a valid order. * #269 \u2014 Alien Dictionary: Infer an ordering from constraints in an unfamiliar alphabet. All three boil down to directed graphs, cycle detection and topological sorting. The two most important techniques are: 1. Kahn\u2019s algorithm: BFS-style processing of nodes with indegree zero. 2. DFS post-order: Recursive exploration with a three-state cycle detector. Both are O(V + E). The interesting question is not which is \u201cfaster\u201d (asymptotically, neither is) but which one makes the reasoning, implementation and operational needs clearer. The post has commented code samples in Python, Java, C# and TypeScript. \ud83d\udd17 https://lnkd.in/gMBJtx-N",
+      "gold": "resource_promotion",
+      "predicted": "technical_explanation"
+    },
+    {
+      "text": "A payment that crosses several microservices cannot rely on a single database transaction. The Saga pattern divides the workflow into local transactions. If a later step fails, earlier steps are reversed through explicit compensating actions. For example: Authorize payment \u2192 Reserve funds \u2192 Post ledger entries \u2192 Confirm payment If ledger posting fails, the platform releases the reserved funds. Saga does not make distributed transactions atomic. It makes partial progress explicit, recoverable, and auditable\u2014which is exactly what a payment platform needs.",
+      "gold": "technical_explanation",
+      "predicted": "discussion_opinion"
+    },
+    {
+      "text": "\ud835\udc0a\ud835\udc1a\ud835\udc1f\ud835\udc24\ud835\udc1a \ud835\udc04\ud835\udc31\ud835\udc29\ud835\udc25\ud835\udc1a\ud835\udc22\ud835\udc27\ud835\udc1e\ud835\udc1d \ud835\udc22\ud835\udc27 \ud835\udc0e\ud835\udc27\ud835\udc1e \ud835\udc0f\ud835\udc22\ud835\udc1c\ud835\udc2d\ud835\udc2e\ud835\udc2b\ud835\udc1e: If you've ever wondered how millions of payment transactions are processed in real time, this diagram is for you. Instead of memorizing Kafka concepts separately, understand how they work together in one complete flow. Here's what happens behind every transaction: A user initiates a payment. The application (Producer) publishes the event. Kafka stores the event inside a Topic, distributes it across Partitions, and replicates it across Brokers for high availability. Multiple Consumers (Fraud Detection, Payment Processing, Notifications, Analytics, Reporting) process the same event independently and in real time. The result? \u2705 High throughput \u2705 Fault tolerance \u2705 Horizontal scalability \u2705 Real-time event streaming This is why Apache Kafka has become a core technology for modern banking, payment platforms, e-commerce, healthcare, and enterprise microservices. Whether you're preparing for Java, Spring Boot, Kafka, System Design, or Backend interviews, I hope this visual makes Kafka easier to understand. \"give me same matter with same content",
+      "gold": "technical_explanation",
+      "predicted": "discussion_opinion"
+    },
+    {
+      "text": "I wrote a new post about how Netflix runs LLM inference in-house on vLLM and Triton, and why one of the failures they describe was inside the model. It covers: - The architecture and the decision to score every model through the same gRPC call rather than standing up a parallel GenAI platform beside the existing one - Why they moved off TensorRT-LLM to vLLM, and why every stated reason was operational. Loading custom architectures without a compilation step, hooks for custom decoding, debuggability. None of it was speed - The packaging fork between Triton's two backends. The clean default keeps the artefact light because it owns the whole lifecycle, which also means there is nowhere to put your own code, so non-standard LLMs fall back to the other path, and the split is permanent - response_format accepted by the schema and then silently dropped before reaching vLLM, so a caller asking for JSON could get malformed JSON back with a success status and no error anywhere - Why constrained decoding looked fine in single-request benchmarks and fell over under real concurrency: the GIL serialised the per-request work and CPU time grew with batch size - The rollout ordering trap, where the consumer cannot switch its config until the new model is live, and live is exactly what starts the failures What I took away: - Nothing broke inside the model. Every failure sat where two pieces of software meet - A compatible API is a promise. Whatever your backend cannot honour gets accepted and ignored, and that fails open - Benchmark under real concurrency or do not benchmark at all - The metrics you never merged are the ones you need during an incident",
+      "gold": "resource_promotion",
+      "predicted": "technical_explanation"
+    },
+    {
+      "text": "Keycloak SPI that blocks duplicate accounts created via email aliases (+tags, Gmail dots). https://lnkd.in/eC4UxZ9E",
+      "gold": "resource_promotion",
+      "predicted": "discussion_opinion"
+    },
+    {
+      "text": "You don't need 5 years to become a strong software engineer. You need 6 months and a clear plan \ud83d\udc47 The formula is simple: \u2705 Build real projects \u2705 Read 2 books a month \u2705 Apply what you read right away Here are 12 books that cover everything you need: \ud83d\udcd8 The Pragmatic Programmer \ud83d\udcd8 Designing Data-Intensive Applications \ud83d\udcd8 Clean Code \ud83d\udcd8 The Mythical Man-Month \ud83d\udcd8 Refactoring \ud83d\udcd8 Working Effectively with Legacy Code \ud83d\udcd8 Software Architecture: The Hard Parts \ud83d\udcd8 Database Internals \ud83d\udcd8 Staff Engineer \ud83d\udcd8 Extreme Ownership \ud83d\udcd8 A Philosophy of Software Design \ud83d\udcd8 Why Programs Fail From clean code to distributed systems, debugging and leadership, each book teaches you a different skill. Reading alone isn't enough. Practice alone isn't enough. Doing both is what makes the difference. \ud83d\udcbe Save this post for later \ud83d\udcac Tell me in the comments: what are you reading right now?",
+      "gold": "resource_promotion",
+      "predicted": "discussion_opinion"
+    },
+    {
+      "text": "Five ways to put a cache between your application and your database, and each one changes what you're trading away. Read-through: the application only ever talks to the cache, and the cache itself loads from the database the moment there's a miss. Cache-aside: the application owns that loading logic instead, checking the cache first and reading from the database itself on a miss, this is the one most teams reach for by default. Write-through: every write goes to the cache first, then immediately through to the database, so the two can never quietly disagree. Write-around: writes go straight to the database, skipping the cache completely, and the cache only gets populated later when that data is actually read. Write-back: writes land in the cache instantly and get flushed to the database asynchronously, which makes writes very fast and makes data loss possible if the cache fails before that flush happens. None of these is the \"correct\" one. Each is a different answer to how stale you can tolerate your cache being, and how much data you can afford to lose if something crashes at the wrong moment. Which of these five is your default, and which one have you actually been burned by?",
+      "gold": "technical_explanation",
+      "predicted": "discussion_opinion"
+    },
+    {
+      "text": "I wrote a new post about pgvector internals, and why \"add a column, build an index\" hides the actual engineering. It covers: - Both index types are genuine Postgres index access methods registered through IndexAmRoutine, so every write goes through the buffer manager, WAL, and MVCC. - What that buys: crash-safe builds, correct replication, visibility in pg_stat_user_indexes. - What it costs: no in-process graph, real page-locking overhead on every read and write. - IVFFlat clusters with k-means and searches only the closest probe partitions. HNSW builds a multilayer graph incrementally. Default to HNSW unless build time or memory is the binding constraint. - Why a top-10 similarity query with a tenant filter can hand back 2 rows: the index scan never sees the WHERE clause, and the executor rechecks visibility and the predicate afterwards. - Iterative scans fix that unevenly. HNSW offers strict_order and relaxed_order, IVFFlat only relaxed_order, so guaranteed distance ordering under a heavy filter is an HNSW-only property. How are you handling filtered vector search in Postgres today?",
+      "gold": "resource_promotion",
+      "predicted": "discussion_opinion"
+    },
+    {
+      "text": "Java records make data modeling cleaner. But cleaner code does not automatically mean cheaper runtime behavior. One thing worth watching in record-heavy code is allocation rate. A record is still an object. It costs the same as an equivalent final class with the same fields. The issue isn't records. It's how many objects we create, and how often. If a hot path keeps creating new instances during mapping, filtering, aggregation, API transformations or event processing, the JVM ends up allocating a large number of short-lived objects. For example: Database Row \u2193 Entity \u2193 Record DTO \u2193 Mapped Record \u2193 Response Record Each transformation may create another object. Individually, that cost is small. The JVM is built for short-lived objects: allocation is a fast pointer bump, and a young GC mostly pays for the objects that survive. At high throughput, it still adds up: More short-lived objects \u2193 Higher allocation rate \u2193 More frequent young GCs \u2193 Objects that live slightly too long get promoted to old gen This does not mean records are bad. It means immutability has a runtime cost when object creation becomes excessive. The JVM can remove some allocations through escape analysis and scalar replacement, but only when the code gets inlined and the object doesn't escape. Performance-sensitive code shouldn't assume every temporary object will disappear. For hot paths, I usually ask: \ud83d\udd39 How many objects are created per request or event? \ud83d\udd39 Are we repeatedly converting between nearly identical DTOs? \ud83d\udd39 Are Streams creating intermediate objects or boxing primitives? (Stream<Integer> vs IntStream) \ud83d\udd39 Is the allocation rate increasing GC frequency? \ud83d\udd39 Can the same data flow use fewer transformations? Records are excellent for: \u2705 Clear data contracts \u2705 DTOs and API responses \u2705 Events \u2705 Immutable-style domain data But in a performance-sensitive path, the better question is not \"Are records efficient?\" It's \"How many objects am I creating, and how often?\" That's where profiling beats assumptions: JFR allocation profiling, async-profiler in alloc mode, or JMH with -prof gc. Clean code and efficient code are not opposites. But at scale, we need to understand the cost of the abstractions we choose. What's the biggest allocation surprise you've found while profiling?",
+      "gold": "technical_explanation",
+      "predicted": "discussion_opinion"
+    },
+    {
+      "text": "Java developers \ud83d\udc4b Java keeps evolving, and some features have really changed how we write backend applications. Which Java feature has improved your day-to-day coding the most?",
+      "gold": "discussion_opinion",
+      "predicted": "discussion_opinion"
+    },
+    {
+      "text": "An HTTP request doesnt go straight from the client to your Spring Boot controller. Between those two points, several components handle filtering, request dispatching, and execution. Understanding that flow also helps when configuring logging, compression, and monitoring.Heres a closer look at what happens under the hood.",
+      "gold": "resource_promotion",
+      "predicted": "discussion_opinion"
+    },
+    {
+      "text": "Your safest parallel service calls might come from a try block, not a CompletableFuture chain. JEP 543, Structured Concurrency, is now proposed to become final in JDK 28, due in March 2027. After seven previews, from JDK 21 to JDK 27, no further changes are planned. That matters wherever one request fans out to several services. With ExecutorService and Future, if one call fails, the others keep running unless you cancel them yourself. The JEP calls this a thread leak. With StructuredTaskScope, you fork the calls inside a try block. If one fails, the scope cancels the rest, and no thread is left running when the block exits. The catch is that cancelled does not mean stopped. Cancellation is an interrupt, so a call that ignores interrupts keeps the scope open until it returns. A downstream service that already got the request may still complete it. I'd start with one endpoint that calls two or three services in parallel. I'd make one service fail and another hang, then check leftover threads, time to cancel, duplicate downstream work and the JSON thread dump. Only then would I set a scope timeout from the caller's deadline and delete the hand-written cancel code. A deadline only holds when every call under it responds to interrupts. Teams on JDK 25 can try it today as a preview, with small API differences. LTS-only teams will get it as final in JDK 29, due in September 2027. When one parallel service call fails, what cancels the others in your code today?",
+      "gold": "technical_explanation",
+      "predicted": "technical_explanation"
+    },
+    {
+      "text": "Designing APIs with Swagger and OpenAPI https://lnkd.in/eXFMUAHv",
+      "gold": "resource_promotion",
+      "predicted": "resource_promotion"
+    },
+    {
+      "text": "\ud83d\ude80 Inside a Data Center Rack \u2013 The Backbone of Modern IT Infrastructure! \ud83d\udda5\ufe0f Ever wondered how servers, networking, storage, and security work together inside a data center? \ud83d\udd39 Patch Panel \u2013 Organizes network connections \ud83d\udd39 Switch \u2013 Connects devices within a network \ud83d\udd39 Firewall \u2013 Protects network traffic \ud83d\udd39 Servers \u2013 Run applications and process data \ud83d\udd39 NAS & Storage \u2013 Store and manage data \ud83d\udd39 Load Balancer \u2013 Distributes traffic across servers \ud83d\udd39 UPS \u2013 Provides backup power \ud83d\udd39 PDU \u2013 Distributes power to rack equipment \ud83d\udca1 Whether you're working with Java, Spring Boot, Microservices, Cloud Computing, or DevOps, understanding the infrastructure behind your applications is essential. \u2601\ufe0f Cloud or on-premises, reliable applications depend on well-designed infrastructure! \ud83d\udcac What's the most critical component in a data center rack for ensuring high availability?",
+      "gold": "technical_explanation",
+      "predicted": "discussion_opinion"
+    },
+    {
+      "text": "Hello Everyone\ud83d\udc4b\ud83d\udc4b What is the difference between throw and throws? throw: Used to explicitly throw an exception. throws: Used in method signature to declare exceptions.",
+      "gold": "technical_explanation",
+      "predicted": "technical_explanation"
+    },
+    {
+      "text": "Java 27 is now available! hashtag#Java27 hashtag#JDK27 hashtag#OpenJDK Download now: social.ora.cl/6015BGuseS Release notes: social.ora.cl/6017BGuset API Javadoc: social.ora.cl/6018BGuseQ Features: social.ora.cl/6010BGusea Blog: social.ora.cl/6013BGuseL",
+      "gold": "resource_promotion",
+      "predicted": "discussion_opinion"
+    },
+    {
+      "text": "New blog alert \ud83d\udea8 \"Orchestrating workflows with Amazon S3 Files and AWS Lambda durable functions using Java SDK \u2013 Part 6 Invoke a Lambda function and parallel execution\". Here is the link to the article \ud83d\udc49 https://lnkd.in/es4KP7Hz In this part, we\u2019ll move the logic associated with each step into a separate Lambda function and use parallel execution.",
+      "gold": "resource_promotion",
+      "predicted": "resource_promotion"
+    },
+    {
+      "text": "One thing I find interesting about working on an existing Java application: Sometimes understanding why the code was written a certain way takes longer than understanding what the code does. There may be business rules, dependencies or old decisions that aren't obvious at first. And changing one thing without understanding the context can create three new problems. \ud83d\ude05 Java developers, what usually takes you longer in an existing project \u2014 understanding the code or understanding the business logic behind it?",
+      "gold": "discussion_opinion",
+      "predicted": "discussion_opinion"
+    },
+    {
+      "text": "Redis is NOT just a cache. When most developers hear \u201cRedis\u201d, the first thing that comes to mind is:\ud83d\udc49 Caching.But Redis can play a much bigger role in a modern distributed system. Here are 8 practical ways Redis can be used: 1\ufe0f\u20e3 CachingStore frequently accessed data in memory and reduce database load.\u23f1\ufe0f TTLs can keep cache management simple. 2\ufe0f\u20e3 Session StorageKeep user sessions in a centralized store.This allows application servers to remain stateless and scale horizontally. 3\ufe0f\u20e3 Rate LimitingControl how many requests a user or service can make.Atomic counters and expiration make Redis a great fit for this. 4\ufe0f\u20e3 LeaderboardsUsing Sorted Sets, you can build real-time rankings without constantly recalculating everything in your database. 5\ufe0f\u20e3 Vector Search amp; Semantic Caching \ud83e\udd16Redis can store embeddings and support AI use cases such as RAG, recommendations, and semantic search.Semantic caching can also reduce unnecessary LLM calls. 6\ufe0f\u20e3 Queues amp; StreamsRedis Streams can help build event-driven systems with consumer groups and acknowledgements. 7\ufe0f\u20e3 Pub/SubNeed to broadcast an event to multiple subscribers in real time?Redis Pub/Sub can handle that without introducing another messaging system for simple use cases. 8\ufe0f\u20e3 Distributed LocksRedis can coordinate access to shared resources across multiple services. \u26a0\ufe0f Always think about expiration/TTL \u2014 an abandoned lock should not block your system forever. The interesting part about Redis isn't only its speed. Its the fact that one infrastructure component can solve several different distributed-system problems. But that doesn't mean Redis should replace every specialized tool. The right choice always depends on the requirements, scale, durability needs, and failure model of your system.\ud83d\udcad How many of these Redis use cases have you actually used in production?",
+      "gold": "technical_explanation",
+      "predicted": "discussion_opinion"
+    },
+    {
+      "text": "A useful watch for anyone working with Java in production. Practical JVM diagnostics and monitoring, with a focus on understanding what the JVM is actually doing. https://lnkd.in/gV5TFpxk",
+      "gold": "resource_promotion",
+      "predicted": "technical_explanation"
+    },
+    {
+      "text": "Claude Certified Architect Certification: 20 Question Which will prepare you for the Real Exam. In this video, I have covered 20 Questions from the Claude Certified Architect preparation series. But the goal isn't just to memorize the correct answers. We look at the architectural thinking behind the questions: tool design, schema validation, atomic operations, workflow dependencies, structured outputs, retries, context limits, and more. \ud83c\udfa5 Watch the video and test your architectural thinking: https://lnkd.in/drS-B4eD",
+      "gold": "resource_promotion",
+      "predicted": "discussion_opinion"
+    },
+    {
+      "text": "With AI doing almost all of the coding part, is coding as a profession dead? That question doesn't sound as crazy as it did a few years ago. Today, AI can write functions, generate entire files, fix errors, write tests, and even work through software projects with surprisingly little human input. And the pace is only increasing. So naturally, a question comes to mind: If AI can write the code, what happens to the people whose job was to write that code? Will companies simply need fewer developers? Will learning to code still be worth it? And what happens to someone who is just starting their career in software? These aren't hypothetical questions anymore. We're already seeing the impact of AI across the industry, and the next few years could change the profession significantly. I made a video exploring this question: \ud83c\udfa5 Is Coding Dead? AI Taking Over Developer Jobs\": https://lnkd.in/dDnsaa-x I don't think the answer is as simple as \u201cAI replaces developers.\u201d But I also don't think we can ignore what is happening. The interesting part is figuring out what remains valuable when writing code becomes incredibly cheap. Watch the full video and let me know what you think. Is coding still a career worth pursuing in the age of AI?",
+      "gold": "discussion_opinion",
+      "predicted": "discussion_opinion"
+    },
+    {
+      "text": "Why parallelStream() Can Make Java Code Slower https://lnkd.in/g8EzmNWS",
+      "gold": "resource_promotion",
+      "predicted": "technical_explanation"
+    },
+    {
+      "text": "\ud83d\udea8 \ud835\uddd7\ud835\uddfc \ud835\ude06\ud835\uddfc\ud835\ude02 \ud835\ude01\ud835\uddf5\ud835\uddf6\ud835\uddfb\ud835\uddf8 \ud835\ude06\ud835\uddfc\ud835\ude02\u2019\ud835\uddff\ud835\uddf2 \ud835\uddff\ud835\uddf2\ud835\uddee\ud835\uddf1\ud835\ude06 \ud835\uddf3\ud835\uddfc\ud835\uddff \ud835\uddee \ud835\udddd\ud835\uddee\ud835\ude03\ud835\uddee \ud835\udff4 \ud835\udde6\ud835\ude01\ud835\uddff\ud835\uddf2\ud835\uddee\ud835\uddfa\ud835\ude00 \ud835\uddf6\ud835\uddfb\ud835\ude01\ud835\uddf2\ud835\uddff\ud835\ude03\ud835\uddf6\ud835\uddf2\ud835\ude04? \ud835\udddf\ud835\uddf2\ud835\ude01\u2019\ud835\ude00 \ud835\ude00\ud835\ude01\ud835\uddee\ud835\uddff\ud835\ude01 \ud835\ude04\ud835\uddf6\ud835\ude01\ud835\uddf5 \ud835\ude01\ud835\uddf5\ud835\uddf2\ud835\ude00\ud835\uddf2 \ud835\udff1 \ud835\uddfe\ud835\ude02\ud835\uddf2\ud835\ude00\ud835\ude01\ud835\uddf6\ud835\uddfc\ud835\uddfb\ud835\ude00. From my experience, these are the kinds of Java 8 Streams coding questions you should be prepared for. Interviewers may ask different problems, but the core concepts are often the same. \ud83d\udd25 \ud835\udde7\ud835\uddfc\ud835\uddfd \ud835\udff1 \ud835\ude01\ud835\uddfc \ud835\uddfd\ud835\uddff\ud835\uddee\ud835\uddf0\ud835\ude01\ud835\uddf6\ud835\uddf0\ud835\uddf2: 1. Find duplicate elements using Streams 2. Find the top 3 highest-paid employees 3. Group employees by department 4. Flatten nested lists using flatMap() 5. Find the longest palindromic substring I compiled 100+ Java coding questions from Easy \u2192 Medium \u2192 Hard covering Streams, Collectors, Optional, Concurrency & CompletableFuture. \ud83d\udcc4 PDF includes solutions. \ud83d\udccc Save it for your next interview.",
+      "gold": "resource_promotion",
+      "predicted": "discussion_opinion"
+    },
+    {
+      "text": "Hi all. Fellow JVM developer here. I built a free interactive system design course and would really value this group's eyes on it. Instead of reading about caches and queues, you build the architecture on a canvas and push simulated traffic through it. In the clip a service gets twice its usual traffic, p99 jumps above 400 ms with the database at 86%, and a single cache brings it back to 140 ms. There are 52 topics from one server to global systems, around 200 production incidents to fix and a sandbox. Free, no signup. The question I care about most: where do the simulator's numbers disagree with what you've seen in real production? https://lnkd.in/d48ehyPc",
+      "gold": "resource_promotion",
+      "predicted": "discussion_opinion"
+    },
+    {
+      "text": "Cleaning a RAG corpus by deleting what looks bad is how you lose answers. Record a decision for every block instead, and leave the document intact. Most published cleaning recipes were built for training models on web crawls, where discarding a page is free because billions remain. A knowledge base has one copy of each answer. Four rules worth keeping: \u2022 Count the documents a block appears in, not its occurrences. A footer in all 19 articles is boilerplate. A safety paragraph repeated three times in one manual is not. \u2022 Never normalise digits away before hashing. \"10 working days\" and \"14 working days\" become one block, and the index keeps whichever it saw first. \u2022 A near-duplicate score measures shared wording, not agreement. Two paragraphs differing in one number can score about 0.95 and contradict each other, so compare the numbers first. \u2022 Presidio's default entity list includes dates and person names, which are often the answer. Pass an explicit list instead. What can wait, and what cannot: \u2022 Four of the five stages can wait, because a wrong call is undone by changing the decision and chunking again \u2022 Personal data cannot, because the leak reaches logs and caches a rebuild never touches Which hurts your index more: a footer filling the top results, or two paragraphs that quietly disagree on a number? Full post, with all five stages worked through on a support knowledge base: https://lnkd.in/gYsGfqZw",
+      "gold": "technical_explanation",
+      "predicted": "discussion_opinion"
+    },
+    {
+      "text": "So far, I\u2019ve published 16 videos in my Spring AI playlist, with many more on the way. The playlist covers topics such as Tool Calling, MCP, Chat Memory, Multi-Agent Systems, and more. If you\u2019re learning Spring AI with Java, feel free to check it out. https://lnkd.in/gJaqRwKY",
+      "gold": "resource_promotion",
+      "predicted": "discussion_opinion"
+    },
+    {
+      "text": "How should a multi-tenant SaaS application isolate customer data? This article compares three common database architectures: shared schema, schema per tenant, and database per tenant. It explores their trade-offs in security, cost, scalability, migrations, and operational complexity. The key takeaway: database isolation is not just a schema decision. It requires the right architecture, authorization controls, and careful implementation. Which approach would you choose for your next SaaS application?",
+      "gold": "resource_promotion",
+      "predicted": "discussion_opinion"
+    },
+    {
+      "text": "Don\u2019t quit impulsively. Don\u2019t stay indefinitely. Keep your job while building your next option \ud83d\udc49 Keep your job while you still need the income and stability. \ud83d\udc49 Assess your situation : salary, growth, learning, management, workload, and work-life balance. \ud83d\udc49 Build your skills so you have more options, not fewer. \ud83d\udc49 Network continuously instead of only networking when unemployed. \ud83d\udc49 Apply quietly to relevant opportunities while employed. \ud83d\udc49 Interview selectively : changing jobs should solve a meaningful problem. \ud83d\udc49 Build a financial cushion so you aren\u2019t forced to accept the first offer. \ud83d\udc49 Leave with a plan : ideally when you have a better opportunity, sufficient savings, or a clear next step.",
+      "gold": "discussion_opinion",
+      "predicted": "discussion_opinion"
+    },
+    {
+      "text": "How to Use TypeSafe\u2019s hashtag#Jev Model in hashtag#Java (Step-by-Step) A beginner-friendly guide to getting categories, scores, and yes/no answers your code can use right away, with no text parsing \ud83d\udd17 https://lnkd.in/e-juN9j8",
+      "gold": "resource_promotion",
+      "predicted": "resource_promotion"
+    }
+  ]
+}
